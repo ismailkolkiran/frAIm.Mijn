@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "myfrAIm Personeelsportaal",
+  title: "Mijn ImmoKeuring Personeelsportaal",
   description: "ImmoKeuring ESSP",
 };
 

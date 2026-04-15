@@ -12,26 +12,37 @@ export default function LoginPage() {
     setError(null);
     setStatus("Verzenden...");
 
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-    if (!response.ok) {
-      const payload = await response.json();
-      setError(payload.error ?? "Loginlink kon niet verzonden worden.");
+      if (!response.ok) {
+        let message = "Loginlink kon niet verzonden worden.";
+        try {
+          const payload = await response.json();
+          message = payload.error ?? message;
+        } catch {
+          // Fall back to generic message when backend doesn't return JSON.
+        }
+        setError(message);
+        setStatus(null);
+        return;
+      }
+
+      setStatus("Loginlink verzonden. Controleer je inbox.");
+    } catch {
+      setError("Netwerkfout bij versturen van de loginlink.");
       setStatus(null);
-      return;
     }
-
-    setStatus("Loginlink verzonden. Controleer je inbox.");
   }
 
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm border border-slate-200">
-        <h1 className="text-2xl font-semibold">myfrAIm Login</h1>
+        <h1 className="text-2xl font-semibold">Mijn ImmoKeuring Login</h1>
         <p className="mt-2 text-sm text-slate-600">Log in met je ImmoKeuring e-mailadres.</p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">

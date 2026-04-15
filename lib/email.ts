@@ -29,13 +29,22 @@ function formatDate(value: string) {
   return new Date(`${value}T00:00:00`).toLocaleDateString("nl-BE");
 }
 
+function ensureSmtpConfigured() {
+  const required = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "SMTP_FROM"] as const;
+  const missing = required.filter((key) => !process.env[key]);
+  if (missing.length > 0) {
+    throw new Error(`SMTP config ontbreekt: ${missing.join(", ")}`);
+  }
+}
+
 export async function sendMagicLinkEmail(email: string, token: string) {
+  ensureSmtpConfigured();
   const appBase = process.env.APP_BASE_URL || "http://localhost:3000";
   const url = `${appBase}/verify?token=${encodeURIComponent(token)}`;
 
   const html = `
     <p>Beste collega,</p>
-    <p>Klik op onderstaande knop om in te loggen op myfrAIm:</p>
+    <p>Klik op onderstaande knop om in te loggen op Mijn ImmoKeuring:</p>
     <p><a href="${url}" style="background:#111827;color:#fff;padding:10px 14px;text-decoration:none;border-radius:6px;">Inloggen</a></p>
     <p>Deze link is 15 minuten geldig.</p>
   `;
@@ -43,7 +52,7 @@ export async function sendMagicLinkEmail(email: string, token: string) {
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to: email,
-    subject: "myfrAIm magische loginlink",
+    subject: "Mijn ImmoKeuring magische loginlink",
     html,
   });
 }

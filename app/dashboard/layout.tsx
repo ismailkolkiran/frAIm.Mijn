@@ -20,7 +20,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="min-h-screen grid grid-cols-[240px_1fr]">
       <aside className="bg-slate-900 text-white p-6 space-y-4">
-        <p className="text-lg font-semibold">myfrAIm</p>
+        <p className="text-lg font-semibold">Mijn ImmoKeuring</p>
         <nav className="space-y-1">
           {links.map((item) => (
             <Link key={item.href} href={item.href} className="block rounded px-3 py-2 hover:bg-slate-800">

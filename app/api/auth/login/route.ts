@@ -9,29 +9,37 @@ const payloadSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const ip = request.ip ?? request.headers.get("x-forwarded-for") ?? "unknown";
+  try {
+    const ip = request.ip ?? request.headers.get("x-forwarded-for") ?? "unknown";
 
-  const allowed = rateLimitByIp(ip);
-  if (!allowed) {
-    return NextResponse.json({ error: "Te veel pogingen. Probeer later opnieuw." }, { status: 429 });
+    const allowed = rateLimitByIp(ip);
+    if (!allowed) {
+      return NextResponse.json({ error: "Te veel pogingen. Probeer later opnieuw." }, { status: 429 });
+    }
+
+    const json = await request.json();
+    const parsed = payloadSchema.safeParse(json);
+
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Ongeldig e-mailadres." }, { status: 400 });
+    }
+
+    const email = parsed.data.email.toLowerCase();
+    const user = await getUserByEmail(email);
+
+    if (!user) {
+      return NextResponse.json({ error: "Gebruiker niet gevonden." }, { status: 404 });
+    }
+
+    const token = await createMagicToken(user.id, user.email);
+    await sendMagicLinkEmail(user.email, token);
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Login mail error:", error);
+    return NextResponse.json(
+      { error: "E-mailservice is niet correct geconfigureerd. Controleer SMTP-variabelen op Render." },
+      { status: 500 },
+    );
   }
-
-  const json = await request.json();
-  const parsed = payloadSchema.safeParse(json);
-
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Ongeldig e-mailadres." }, { status: 400 });
-  }
-
-  const email = parsed.data.email.toLowerCase();
-  const user = await getUserByEmail(email);
-
-  if (!user) {
-    return NextResponse.json({ error: "Gebruiker niet gevonden." }, { status: 404 });
-  }
-
-  const token = await createMagicToken(user.id, user.email);
-  await sendMagicLinkEmail(user.email, token);
-
-  return NextResponse.json({ ok: true });
 }
