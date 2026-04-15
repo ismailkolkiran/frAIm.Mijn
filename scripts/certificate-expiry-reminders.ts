@@ -1,0 +1,3 @@
+import { listCertificatesExpiringIn60DaysWithoutReminder, markCertificateReminderSent } from "../lib/certificates";
+import { sendCertificateExpiryReminderEmail } from "../lib/email";
+async function run(){const certs=await listCertificatesExpiringIn60DaysWithoutReminder();let sent=0;for(const c of certs){if(!c.vervaldatum) continue;await sendCertificateExpiryReminderEmail({to:c.email,naam:c.volledige_naam,certificaatNaam:c.naam??'Certificaat',vervaldatum:c.vervaldatum});await markCertificateReminderSent(c.id);sent++;}console.log(`Certificaat reminders verstuurd: ${sent}`);}run().catch(e=>{console.error(e);process.exit(1);});
