@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo, useState } from "react";
+
 type Report = {
   id: number;
   volledige_naam: string;
@@ -18,7 +20,29 @@ function olderThan24h(dateValue: string) {
 }
 
 export default function AdminZiekmeldingenClient({ reports }: { reports: Report[] }) {
-  const missingLate = reports.filter((r) => !r.briefje_url && olderThan24h(r.aangemaakt_op));
+  const [selectedEmployee, setSelectedEmployee] = useState("all");
+
+  const employeeOptions = useMemo(() => {
+    const map = new Map<string, { label: string; email: string }>();
+    for (const report of reports) {
+      if (!map.has(report.email)) {
+        map.set(report.email, {
+          email: report.email,
+          label: `${report.volledige_naam} (${report.email})`,
+        });
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
+  }, [reports]);
+
+  const filteredReports = useMemo(() => {
+    if (selectedEmployee === "all") {
+      return reports;
+    }
+    return reports.filter((report) => report.email === selectedEmployee);
+  }, [reports, selectedEmployee]);
+
+  const missingLate = filteredReports.filter((r) => !r.briefje_url && olderThan24h(r.aangemaakt_op));
 
   return (
     <section className="space-y-6 p-6">
@@ -28,8 +52,26 @@ export default function AdminZiekmeldingenClient({ reports }: { reports: Report[
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-6">
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-slate-700">
+            Filter op werknemer
+            <select
+              className="mt-1 w-full max-w-lg rounded border border-slate-300 px-3 py-2"
+              value={selectedEmployee}
+              onChange={(event) => setSelectedEmployee(event.target.value)}
+            >
+              <option value="all">Alle werknemers</option>
+              {employeeOptions.map((employee) => (
+                <option key={employee.email} value={employee.email}>
+                  {employee.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
         <ul className="divide-y divide-slate-100">
-          {reports.map((report) => {
+          {filteredReports.map((report) => {
             const missing = !report.briefje_url;
             const late = missing && olderThan24h(report.aangemaakt_op);
 
@@ -49,7 +91,7 @@ export default function AdminZiekmeldingenClient({ reports }: { reports: Report[
               </li>
             );
           })}
-          {reports.length === 0 ? <li className="py-3 text-sm text-slate-500">Geen ziekmeldingen.</li> : null}
+          {filteredReports.length === 0 ? <li className="py-3 text-sm text-slate-500">Geen ziekmeldingen voor deze filter.</li> : null}
         </ul>
       </div>
     </section>
