@@ -7,18 +7,31 @@ type CloudinaryConfig = {
 };
 
 function parseCloudinaryUrl(): CloudinaryConfig {
-  const raw = process.env.CLOUDINARY_URL;
-  if (!raw) {
-    throw new Error("CLOUDINARY_URL ontbreekt");
+  const envCloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
+  const envApiKey = process.env.CLOUDINARY_API_KEY?.trim();
+  const envApiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
+
+  if (envCloudName && envApiKey && envApiSecret) {
+    return {
+      cloudName: envCloudName,
+      apiKey: envApiKey,
+      apiSecret: envApiSecret,
+    };
   }
 
-  const url = new URL(raw);
+  const raw = process.env.CLOUDINARY_URL?.trim();
+  if (!raw) {
+    throw new Error("Cloudinary config ontbreekt. Gebruik CLOUDINARY_URL of losse CLOUDINARY_* variabelen.");
+  }
+
+  const cleaned = raw.replace(/^["']|["']$/g, "");
+  const url = new URL(cleaned);
   const cloudName = url.hostname;
   const apiKey = decodeURIComponent(url.username);
   const apiSecret = decodeURIComponent(url.password);
 
   if (!cloudName || !apiKey || !apiSecret) {
-    throw new Error("CLOUDINARY_URL heeft een ongeldig formaat");
+    throw new Error("Cloudinary config ongeldig. Controleer CLOUDINARY_URL formaat.");
   }
 
   return { cloudName, apiKey, apiSecret };
