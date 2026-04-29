@@ -57,6 +57,23 @@ export async function sendMagicLinkEmail(email: string, token: string) {
   });
 }
 
+export async function sendLoginCodeEmail(email: string, code: string) {
+  ensureSmtpConfigured();
+  const html = `
+    <p>Beste collega,</p>
+    <p>Gebruik onderstaande code om in te loggen op Mijn ImmoKeuring:</p>
+    <p style="font-size:28px;font-weight:700;letter-spacing:6px;margin:16px 0;">${code}</p>
+    <p>Deze code is 15 minuten geldig en kan slechts 1 keer gebruikt worden.</p>
+  `;
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM,
+    to: email,
+    subject: "Mijn ImmoKeuring inlogcode",
+    html,
+  });
+}
+
 export async function sendLeaveApprovedEmail(input: LeaveMailInput) {
   await transporter.sendMail({
     from: process.env.SMTP_FROM,

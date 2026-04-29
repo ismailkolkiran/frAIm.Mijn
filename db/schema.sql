@@ -176,6 +176,17 @@ CREATE TABLE IF NOT EXISTS email_logs (
   status VARCHAR(50)
 );
 
+CREATE TABLE IF NOT EXISTS login_codes (
+  id SERIAL PRIMARY KEY,
+  user_id INT REFERENCES gebruikers(id) ON DELETE CASCADE,
+  email VARCHAR(255) NOT NULL,
+  code_hash VARCHAR(255) NOT NULL,
+  attempts INT DEFAULT 0,
+  expires_at TIMESTAMP NOT NULL,
+  consumed_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
 
 CREATE TABLE IF NOT EXISTS onboarding_dossiers (
   id SERIAL PRIMARY KEY,

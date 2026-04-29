@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createSessionToken, verifyMagicToken } from "@/lib/auth";
+import { createSessionToken, getRoleForEmail } from "@/lib/auth";
+import { isManualLoginCodeValid } from "@/lib/manual-login-codes";
+import { getUserByEmail } from "@/lib/users";
 
 const payloadSchema = z.object({
-  token: z.string().min(10),
+  email: z.string().email(),
+  code: z.string().regex(/^\d{6}$/),
 });
 
 export async function POST(request: NextRequest) {
@@ -11,18 +14,25 @@ export async function POST(request: NextRequest) {
   const parsed = payloadSchema.safeParse(json);
 
   if (!parsed.success) {
-    return NextResponse.json({ error: "Token ontbreekt." }, { status: 400 });
+    return NextResponse.json({ error: "E-mail of code is ongeldig." }, { status: 400 });
   }
 
-  const payload = await verifyMagicToken(parsed.data.token);
-  if (!payload) {
-    return NextResponse.json({ error: "Token ongeldig of verlopen." }, { status: 401 });
+  const email = parsed.data.email.toLowerCase();
+  const user = await getUserByEmail(email);
+  if (!user) {
+    return NextResponse.json({ error: "E-mail of code klopt niet." }, { status: 401 });
   }
 
+  const verified = isManualLoginCodeValid(email, parsed.data.code);
+  if (!verified) {
+    return NextResponse.json({ error: "Code ongeldig." }, { status: 401 });
+  }
+
+  const role = getRoleForEmail(user.email);
   const sessionToken = await createSessionToken({
-    sub: String(payload.userId),
-    email: payload.email,
-    role: payload.role,
+    sub: String(user.id),
+    email: user.email,
+    role,
   });
 
   const response = NextResponse.json({ ok: true });

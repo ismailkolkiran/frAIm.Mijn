@@ -35,8 +35,17 @@ export function rateLimitByIp(ip: string) {
   return true;
 }
 
+export function getRoleForEmail(email: string): "admin" | "employee" {
+  const normalized = email.toLowerCase().trim();
+  const adminEmails = (process.env.ADMIN_EMAILS || "ismail.kolkiran@immokeuring.be")
+    .split(",")
+    .map((item) => item.toLowerCase().trim())
+    .filter(Boolean);
+  return adminEmails.includes(normalized) ? "admin" : "employee";
+}
+
 export async function createMagicToken(userId: number, email: string) {
-  const role = email === "ismail.kolkiran@immokeuring.be" ? "admin" : "employee";
+  const role = getRoleForEmail(email);
 
   return new SignJWT({ userId, email, role } as MagicPayload)
     .setProtectedHeader({ alg: "HS256" })

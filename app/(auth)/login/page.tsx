@@ -4,13 +4,14 @@ import { FormEvent, useState } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    setStatus("Verzenden...");
+    setStatus("Code controleren...");
 
     try {
       const response = await fetch("/api/auth/login", {
@@ -20,7 +21,7 @@ export default function LoginPage() {
       });
 
       if (!response.ok) {
-        let message = "Loginlink kon niet verzonden worden.";
+        let message = "Login kon niet verwerkt worden.";
         try {
           const payload = await response.json();
           message = payload.error ?? message;
@@ -32,9 +33,28 @@ export default function LoginPage() {
         return;
       }
 
-      setStatus("Loginlink verzonden. Controleer je inbox.");
+      const verifyResponse = await fetch("/api/auth/verify-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code }),
+      });
+
+      if (!verifyResponse.ok) {
+        let message = "Code ongeldig of verlopen.";
+        try {
+          const payload = await verifyResponse.json();
+          message = payload.error ?? message;
+        } catch {
+          // Fall back to generic message when backend doesn't return JSON.
+        }
+        setError(message);
+        setStatus(null);
+        return;
+      }
+
+      window.location.href = "/dashboard/home";
     } catch {
-      setError("Netwerkfout bij versturen van de loginlink.");
+      setError("Netwerkfout bij inloggen.");
       setStatus(null);
     }
   }
@@ -43,7 +63,7 @@ export default function LoginPage() {
     <main className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm border border-slate-200">
         <h1 className="text-2xl font-semibold">Mijn ImmoKeuring Login</h1>
-        <p className="mt-2 text-sm text-slate-600">Log in met je ImmoKeuring e-mailadres.</p>
+        <p className="mt-2 text-sm text-slate-600">Log in met je ImmoKeuring e-mailadres en vaste code.</p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <label className="block">
@@ -57,11 +77,23 @@ export default function LoginPage() {
               placeholder="naam@immokeuring.be"
             />
           </label>
+          <label className="block">
+            <span className="text-sm font-medium">Inlogcode</span>
+            <input
+              type="text"
+              required
+              value={code}
+              onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 tracking-[0.35em]"
+              placeholder="123456"
+              inputMode="numeric"
+            />
+          </label>
           <button
             type="submit"
             className="w-full rounded-lg bg-slate-900 text-white py-2.5 font-medium hover:bg-slate-800"
           >
-            Verstuur magische link
+            Inloggen
           </button>
         </form>
 

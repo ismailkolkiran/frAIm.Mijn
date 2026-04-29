@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createMagicToken, rateLimitByIp } from "@/lib/auth";
-import { sendMagicLinkEmail } from "@/lib/email";
+import { rateLimitByIp } from "@/lib/auth";
 import { getUserByEmail } from "@/lib/users";
 
 const payloadSchema = z.object({
@@ -31,14 +30,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Gebruiker niet gevonden." }, { status: 404 });
     }
 
-    const token = await createMagicToken(user.id, user.email);
-    await sendMagicLinkEmail(user.email, token);
-
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Login mail error:", error);
     return NextResponse.json(
-      { error: "E-mailservice is niet correct geconfigureerd. Controleer SMTP-variabelen op Render." },
+      { error: "Login kon niet verwerkt worden." },
       { status: 500 },
     );
   }

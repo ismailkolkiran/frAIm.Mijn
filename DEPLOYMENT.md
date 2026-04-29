@@ -10,6 +10,7 @@
 Maak `.env.local` met minimaal:
 - `DATABASE_URL`
 - `JWT_SECRET`
+- `ADMIN_EMAILS` (komma-gescheiden, bv. `ismail.kolkiran@immokeuring.be`)
 - `CLOUDINARY_URL`
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
 - `APP_BASE_URL`
@@ -32,7 +33,7 @@ npm run start
 
 ## 5) Post-deploy checks
 - Controleer health endpoint: `GET /api/health`
-- Controleer login magic link flow
+- Controleer login met e-mail + 6-cijferige code
 - Controleer upload (document + foto)
 - Controleer admin routes
 
