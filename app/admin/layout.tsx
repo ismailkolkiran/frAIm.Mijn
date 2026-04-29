@@ -1,9 +1,18 @@
 import Link from "next/link";
 import { logout } from "@/lib/auth-actions";
+import { getAdminNotificationCounts } from "@/lib/admin-notifications";
 import { requireAdminUser } from "@/lib/session";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireAdminUser();
+  const notificationCounts = await getAdminNotificationCounts();
+  const badges: Record<string, number> = {
+    "/admin/dashboard": notificationCounts.total,
+    "/admin/verlofaanvragen": notificationCounts.leavePending,
+    "/admin/ziekmeldingen": notificationCounts.sickOpen,
+    "/admin/trainingen": notificationCounts.trainingPending,
+    "/admin/fleet": notificationCounts.fleetApprovalRequired,
+  };
 
   const links = [
     { href: "/dashboard/home", label: "Home" },
@@ -30,8 +39,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <p className="text-lg font-semibold">Mijn ImmoKeuring</p>
         <nav className="space-y-1">
           {links.map((item) => (
-            <Link key={item.href} href={item.href} className="block rounded px-3 py-2 hover:bg-slate-800">
-              {item.label}
+            <Link key={item.href} href={item.href} className="flex items-center justify-between rounded px-3 py-2 hover:bg-slate-800">
+              <span>{item.label}</span>
+              {badges[item.href] ? (
+                <span className="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-xs font-semibold text-white">
+                  {badges[item.href]}
+                </span>
+              ) : null}
             </Link>
           ))}
         </nav>

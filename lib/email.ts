@@ -37,6 +37,41 @@ function ensureSmtpConfigured() {
   }
 }
 
+function getAdminRecipients() {
+  return (process.env.ADMIN_EMAILS || "ismail.kolkiran@immokeuring.be")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join(",");
+}
+
+export async function sendAdminRequestNotificationEmail(input: {
+  type: "verlof" | "ziekmelding" | "bijscholing" | "wagenpark";
+  employeeName: string;
+  employeeEmail: string;
+  details: string;
+}) {
+  ensureSmtpConfigured();
+  const subjectByType = {
+    verlof: "Nieuwe verlofaanvraag",
+    ziekmelding: "Nieuwe ziekmelding",
+    bijscholing: "Nieuwe aanvraag jaarlijkse bijscholing",
+    wagenpark: "Nieuwe aanvraag auto-onderhoud/herstel",
+  } as const;
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM,
+    to: getAdminRecipients(),
+    subject: `[Mijn ImmoKeuring] ${subjectByType[input.type]}`,
+    html: `
+      <p>Er is een nieuwe aanvraag binnengekomen.</p>
+      <p><strong>Type:</strong> ${subjectByType[input.type]}</p>
+      <p><strong>Werknemer:</strong> ${input.employeeName} (${input.employeeEmail})</p>
+      <p><strong>Details:</strong> ${input.details}</p>
+    `,
+  });
+}
+
 export async function sendMagicLinkEmail(email: string, token: string) {
   ensureSmtpConfigured();
   const appBase = process.env.APP_BASE_URL || "http://localhost:3000";

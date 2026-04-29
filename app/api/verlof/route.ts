@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { sendAdminRequestNotificationEmail } from "@/lib/email";
 import { getSessionUser } from "@/lib/session";
 import {
   calculateWorkingHours,
@@ -51,6 +52,17 @@ export async function POST(request: NextRequest) {
     verloftype: parsed.data.verloftype,
     opmerkingen: parsed.data.opmerkingen ?? null,
   });
+
+  try {
+    await sendAdminRequestNotificationEmail({
+      type: "verlof",
+      employeeName: user.volledige_naam,
+      employeeEmail: user.email,
+      details: `${parsed.data.verloftype}: ${parsed.data.startdatum} t/m ${parsed.data.einddatum} (${uren} uur)`,
+    });
+  } catch (error) {
+    console.error("Admin leave notification failed:", error);
+  }
 
   return NextResponse.json({ ok: true, requestId, uren });
 }

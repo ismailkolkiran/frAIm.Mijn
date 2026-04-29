@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { sendAdminRequestNotificationEmail, sendSickLeaveConfirmationEmail } from "@/lib/email";
 import { getSessionUser } from "@/lib/session";
 import { createSickReport, listMySickReports } from "@/lib/sick-leave";
-import { sendSickLeaveConfirmationEmail } from "@/lib/email";
 
 const schema = z.object({
   startdatum: z.string().min(10),
@@ -40,12 +40,27 @@ export async function POST(request: NextRequest) {
     bevestigd_door_werknemer: parsed.data.bevestigd_door_werknemer,
   });
 
-  await sendSickLeaveConfirmationEmail({
-    to: user.email,
-    naam: user.volledige_naam,
-    startdatum: parsed.data.startdatum,
-    einddatum: parsed.data.einddatum,
-  });
+  try {
+    await sendSickLeaveConfirmationEmail({
+      to: user.email,
+      naam: user.volledige_naam,
+      startdatum: parsed.data.startdatum,
+      einddatum: parsed.data.einddatum,
+    });
+  } catch (error) {
+    console.error("Sick leave confirmation email failed:", error);
+  }
+
+  try {
+    await sendAdminRequestNotificationEmail({
+      type: "ziekmelding",
+      employeeName: user.volledige_naam,
+      employeeEmail: user.email,
+      details: `${parsed.data.startdatum} t/m ${parsed.data.einddatum}${parsed.data.reden ? ` (${parsed.data.reden})` : ""}`,
+    });
+  } catch (error) {
+    console.error("Admin sick leave notification failed:", error);
+  }
 
   return NextResponse.json({ ok: true, id });
 }

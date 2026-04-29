@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { sendAdminRequestNotificationEmail } from "@/lib/email";
 import { getSessionUser } from "@/lib/session";
 import { createMaintenanceLog, getAssignedVehicle } from "@/lib/fleet";
 
@@ -34,6 +35,17 @@ export async function POST(request: NextRequest) {
     garagenaam: parsed.data.garagenaam ?? null,
     notities: `Kilometerstand: ${parsed.data.kilometerstand}${parsed.data.extraOpmerkingen ? `\nMankementen/opmerkingen: ${parsed.data.extraOpmerkingen}` : ""}${parsed.data.notities ? `\n${parsed.data.notities}` : ""}${approvalRequired ? "\n[ADMIN_APPROVAL_REQUIRED]" : ""}`.trim(),
   });
+
+  try {
+    await sendAdminRequestNotificationEmail({
+      type: "wagenpark",
+      employeeName: user.volledige_naam,
+      employeeEmail: user.email,
+      details: `${parsed.data.type} op ${parsed.data.onderhoudsdatum} (${parsed.data.beschrijving})`,
+    });
+  } catch (error) {
+    console.error("Admin fleet notification failed:", error);
+  }
 
   return NextResponse.json({ ok: true, approvalRequired });
 }
