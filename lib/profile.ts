@@ -11,9 +11,8 @@ export type ProfileData = {
   nationaliteit: string | null;
   telefoon: string | null;
   adres: string | null;
-  belastingnummer: string | null;
+  btw_nummer: string | null;
   bankrekeningnummer: string | null;
-  rsz_nummer: string | null;
   profielfoto_url: string | null;
   startdatum: string | null;
 };
@@ -26,9 +25,8 @@ export type ProfileUpdateInput = {
   nationaliteit: string | null;
   telefoon: string | null;
   adres: string | null;
-  belastingnummer: string | null;
+  btw_nummer: string | null;
   bankrekeningnummer: string | null;
-  rsz_nummer: string | null;
 };
 
 function tryDecrypt(value: string | null) {
@@ -68,9 +66,8 @@ export async function getProfileByUserId(userId: number) {
         nationaliteit,
         telefoon,
         adres,
-        belastingnummer,
+        belastingnummer AS btw_nummer,
         bankrekeningnummer,
-        rsz_nummer,
         profielfoto_url,
         startdatum::text
       FROM gebruikers
@@ -87,9 +84,8 @@ export async function getProfileByUserId(userId: number) {
 
   return {
     ...row,
-    belastingnummer: tryDecrypt(row.belastingnummer),
+    btw_nummer: tryDecrypt(row.btw_nummer),
     bankrekeningnummer: tryDecrypt(row.bankrekeningnummer),
-    rsz_nummer: tryDecrypt(row.rsz_nummer),
   };
 }
 
@@ -107,7 +103,7 @@ export async function updateProfileByUserId(userId: number, input: ProfileUpdate
         adres = $8,
         belastingnummer = $9,
         bankrekeningnummer = $10,
-        rsz_nummer = $11,
+        rsz_nummer = NULL,
         bijgewerkt_op = NOW()
       WHERE id = $1
     `,
@@ -120,9 +116,9 @@ export async function updateProfileByUserId(userId: number, input: ProfileUpdate
       input.nationaliteit,
       input.telefoon,
       input.adres,
-      maybeEncrypt(input.belastingnummer),
+      maybeEncrypt(input.btw_nummer),
       maybeEncrypt(input.bankrekeningnummer),
-      maybeEncrypt(input.rsz_nummer),
+      null,
     ],
   );
 

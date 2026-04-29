@@ -12,9 +12,8 @@ type Profile = {
   nationaliteit: string | null;
   telefoon: string | null;
   adres: string | null;
-  belastingnummer: string | null;
+  btw_nummer: string | null;
   bankrekeningnummer: string | null;
-  rsz_nummer: string | null;
   profielfoto_url: string | null;
   startdatum: string | null;
 };
@@ -146,11 +145,10 @@ export default function ProfileClient({
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold">RSZ & Bank (versleuteld)</h2>
-          <div className="grid md:grid-cols-3 gap-4 mt-4">
-            <Input label="Belastingnummer" value={profile.belastingnummer ?? ""} onChange={(v) => setProfile({ ...profile, belastingnummer: v })} />
+          <h2 className="text-lg font-semibold">Bank & ondernemingsgegevens (versleuteld)</h2>
+          <div className="grid md:grid-cols-2 gap-4 mt-4">
+            <Input label="BTW nummer (indien in het bezit)" value={profile.btw_nummer ?? ""} onChange={(v) => setProfile({ ...profile, btw_nummer: v })} />
             <Input label="Bankrekeningnummer" value={profile.bankrekeningnummer ?? ""} onChange={(v) => setProfile({ ...profile, bankrekeningnummer: v })} />
-            <Input label="RSZ nummer" value={profile.rsz_nummer ?? ""} onChange={(v) => setProfile({ ...profile, rsz_nummer: v })} />
           </div>
         </div>
 

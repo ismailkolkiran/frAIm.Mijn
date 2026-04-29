@@ -122,7 +122,7 @@ export default function ZiekmeldingenClient({ initialReports }: { initialReports
 
         <label className="flex items-start gap-2 text-sm">
           <input type="checkbox" checked={bevestigd} onChange={(e) => setBevestigd(e.target.checked)} required />
-          <span>Ik bevestig dat ik binnen 24 uur mijn doktersbriefje upload indien vereist.</span>
+          <span>Ik bevestig dat ik binnen 24 uur mijn ziektebrief upload.</span>
         </label>
 
         <button className="rounded bg-slate-900 text-white px-4 py-2">Ziekmelding indienen</button>

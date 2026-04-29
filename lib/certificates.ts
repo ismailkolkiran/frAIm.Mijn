@@ -41,9 +41,9 @@ export async function createCertificate(input: {
   userId: number;
   naam: string;
   type: string;
-  bestandUrl: string;
+  bestandUrl: string | null;
   uitgiftedatum: string | null;
-  vervaldatum: string;
+  vervaldatum: string | null;
 }) {
   await pool.query(
     `

@@ -32,8 +32,8 @@ export default function AdminWerknemersClient({ initialEmployees }: { initialEmp
   async function resetPassword(id: number) {
     const r = await fetch(`/api/admin/werknemers/${id}?action=reset-password`, { method: 'POST' });
     const p = await r.json();
-    if (p?.reset?.tempPassword) {
-      window.alert(`Tijdelijk wachtwoord: ${p.reset.tempPassword}`);
+    if (p?.reset?.tempCode) {
+      window.alert(`Nieuwe inlogcode: ${p.reset.tempCode}`);
     }
   }
 

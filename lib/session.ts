@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { getRoleForEmail } from "@/lib/auth";
 import { verifySessionToken } from "@/lib/auth";
 import { getUserById } from "@/lib/users";
 
@@ -25,7 +26,7 @@ export async function getSessionUser() {
 
 export async function requireAdminUser() {
   const user = await getSessionUser();
-  if (user.email !== "ismail.kolkiran@immokeuring.be") {
+  if (getRoleForEmail(user.email) !== "admin") {
     redirect("/dashboard/home");
   }
 

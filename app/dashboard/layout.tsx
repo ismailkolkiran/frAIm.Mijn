@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { logout } from "@/lib/auth-actions";
+import { getRoleForEmail } from "@/lib/auth";
 import { getSessionUser } from "@/lib/session";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -11,8 +12,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { href: "/dashboard/verlof", label: "Verlof" },
     { href: "/dashboard/ziekmeldingen", label: "Ziekmeldingen" },
     { href: "/dashboard/auto", label: "Bedrijfsauto" },
-    { href: "/dashboard/certificaten", label: "Certificaten" },
-    { href: "/dashboard/trainingen", label: "Trainingen" },
+    { href: "/dashboard/certificaten", label: "Hoogst behaalde diploma en certificaten" },
+    { href: "/dashboard/trainingen", label: "Jaarlijkse bijscholingen" },
     { href: "/dashboard/emailsignature", label: "E-mailhandtekening" },
     { href: "/dashboard/documenten", label: "Documenten" },
   ];
@@ -27,7 +28,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               {item.label}
             </Link>
           ))}
-          {user.email === "ismail.kolkiran@immokeuring.be" ? (
+          {getRoleForEmail(user.email) === "admin" ? (
             <>
               <Link href="/admin/dashboard" className="block rounded px-3 py-2 hover:bg-slate-800">
                 Admin Dashboard

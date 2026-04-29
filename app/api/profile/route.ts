@@ -11,9 +11,8 @@ const profileSchema = z.object({
   nationaliteit: z.string().nullable(),
   telefoon: z.string().nullable(),
   adres: z.string().nullable(),
-  belastingnummer: z.string().nullable(),
+  btw_nummer: z.string().nullable(),
   bankrekeningnummer: z.string().nullable(),
-  rsz_nummer: z.string().nullable(),
 });
 
 export async function GET() {
@@ -50,9 +49,8 @@ export async function PUT(request: NextRequest) {
     nationaliteit: normalize(parsed.data.nationaliteit),
     telefoon: normalize(parsed.data.telefoon),
     adres: normalize(parsed.data.adres),
-    belastingnummer: normalize(parsed.data.belastingnummer),
+    btw_nummer: normalize(parsed.data.btw_nummer),
     bankrekeningnummer: normalize(parsed.data.bankrekeningnummer),
-    rsz_nummer: normalize(parsed.data.rsz_nummer),
   });
 
   return NextResponse.json({ ok: true, profile: updated });

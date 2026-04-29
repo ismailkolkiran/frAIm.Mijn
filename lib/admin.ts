@@ -66,8 +66,8 @@ export async function deleteEmployee(id: number) {
 }
 
 export async function resetEmployeePassword(id: number) {
-  const tempPassword = Math.random().toString(36).slice(-10) + "A1!";
-  const hash = await bcrypt.hash(tempPassword, 10);
+  const tempCode = Math.floor(Math.random() * 1_000_000).toString().padStart(6, "0");
+  const hash = await bcrypt.hash(tempCode, 10);
   const result = await pool.query<{ email: string; volledige_naam: string }>(`UPDATE gebruikers SET wachtwoord_hash=$2 WHERE id=$1 RETURNING email, volledige_naam`, [id, hash]);
-  return { tempPassword, user: result.rows[0] ?? null };
+  return { tempCode, user: result.rows[0] ?? null };
 }

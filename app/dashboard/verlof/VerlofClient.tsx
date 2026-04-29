@@ -40,7 +40,7 @@ export default function VerlofClient({
   const [requests, setRequests] = useState(initialRequests);
   const [startdatum, setStartdatum] = useState("");
   const [einddatum, setEinddatum] = useState("");
-  const [verloftype, setVerloftype] = useState("vakantie");
+  const [verloftype, setVerloftype] = useState("jaarlijks_verlof");
   const [opmerkingen, setOpmerkingen] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -105,9 +105,10 @@ export default function VerlofClient({
           <label className="block">
             <span className="text-sm font-medium">Verloftype</span>
             <select className="mt-1 w-full rounded border border-slate-300 px-3 py-2" value={verloftype} onChange={(e) => setVerloftype(e.target.value)}>
-              <option value="vakantie">Vakantie</option>
-              <option value="persoonlijk">Persoonlijk</option>
-              <option value="rouwen">Rouwen</option>
+              <option value="jaarlijks_verlof">Jaarlijks verlof</option>
+              <option value="onbetaald_verlof">Onbetaald verlof</option>
+              <option value="ouderschapsverlof">Ouderschapsverlof</option>
+              <option value="zwangerschapsverlof">Zwangerschapsverlof</option>
             </select>
           </label>
           <label className="block md:col-span-2">

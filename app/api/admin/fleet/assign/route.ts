@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireAdminUser } from "@/lib/session";
 import { assignVehicle } from "@/lib/fleet";
 
-const schema = z.object({ vehicleId: z.number(), userId: z.number().nullable() });
+const schema = z.object({ vehicleId: z.coerce.number(), userId: z.coerce.number().nullable() });
 
 export async function POST(request: NextRequest) {
   await requireAdminUser();

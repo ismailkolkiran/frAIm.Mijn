@@ -14,3 +14,7 @@ export function isManualLoginCodeValid(email: string, code: string) {
   const expected = manualLoginCodes[normalizedEmail];
   return expected === code;
 }
+
+export function getManualLoginCodeForEmail(email: string) {
+  return manualLoginCodes[email.toLowerCase().trim()] ?? null;
+}

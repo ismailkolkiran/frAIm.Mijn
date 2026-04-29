@@ -12,7 +12,7 @@ import {
 const requestSchema = z.object({
   startdatum: z.string().min(10),
   einddatum: z.string().min(10),
-  verloftype: z.enum(["vakantie", "persoonlijk", "rouwen"]),
+  verloftype: z.enum(["jaarlijks_verlof", "onbetaald_verlof", "ouderschapsverlof", "zwangerschapsverlof"]),
   opmerkingen: z.string().optional(),
 });
 

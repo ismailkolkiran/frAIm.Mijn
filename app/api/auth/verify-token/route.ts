@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createSessionToken, getRoleForEmail } from "@/lib/auth";
-import { isManualLoginCodeValid } from "@/lib/manual-login-codes";
+import { createSessionToken, getRoleForEmail, verifyLoginCodeForUser } from "@/lib/auth";
 import { getUserByEmail } from "@/lib/users";
 
 const payloadSchema = z.object({
@@ -23,7 +22,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "E-mail of code klopt niet." }, { status: 401 });
   }
 
-  const verified = isManualLoginCodeValid(email, parsed.data.code);
+  const verified = await verifyLoginCodeForUser(user.id, email, parsed.data.code);
   if (!verified) {
     return NextResponse.json({ error: "Code ongeldig." }, { status: 401 });
   }

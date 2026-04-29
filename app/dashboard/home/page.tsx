@@ -7,7 +7,7 @@ export default async function DashboardHome() {
 
   const cards = [
     { title: "Verlof restant (uren)", value: metrics.verlofRestantUren.toFixed(1) },
-    { title: "Vervallende certificaten (<60d)", value: String(metrics.vervallendeCertificaten) },
+    { title: "Vervallende diploma's/certificaten (<60d)", value: String(metrics.vervallendeCertificaten) },
     { title: "Openstaande goedkeuringen", value: String(metrics.openstaandeGoedkeuringen) },
     { title: "Nieuwe documenten (14d)", value: String(metrics.nieuweDocumenten) },
   ];

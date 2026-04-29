@@ -3,7 +3,16 @@ import { z } from "zod";
 import { getSessionUser } from "@/lib/session";
 import { createMaintenanceLog, getAssignedVehicle } from "@/lib/fleet";
 
-const schema = z.object({ onderhoudsdatum: z.string().min(10), type: z.string().min(2), beschrijving: z.string().min(2), kosten: z.number().nullable().optional(), garagenaam: z.string().nullable().optional(), notities: z.string().nullable().optional() });
+const schema = z.object({
+  onderhoudsdatum: z.string().min(10),
+  type: z.string().min(2),
+  beschrijving: z.string().min(2),
+  kilometerstand: z.number().int().nonnegative(),
+  extraOpmerkingen: z.string().nullable().optional(),
+  kosten: z.number().nullable().optional(),
+  garagenaam: z.string().nullable().optional(),
+  notities: z.string().nullable().optional(),
+});
 
 export async function POST(request: NextRequest) {
   const user = await getSessionUser();
@@ -23,7 +32,7 @@ export async function POST(request: NextRequest) {
     beschrijving: parsed.data.beschrijving,
     kosten,
     garagenaam: parsed.data.garagenaam ?? null,
-    notities: `${parsed.data.notities ?? ""}${approvalRequired ? "\n[ADMIN_APPROVAL_REQUIRED]" : ""}`.trim() || null,
+    notities: `Kilometerstand: ${parsed.data.kilometerstand}${parsed.data.extraOpmerkingen ? `\nMankementen/opmerkingen: ${parsed.data.extraOpmerkingen}` : ""}${parsed.data.notities ? `\n${parsed.data.notities}` : ""}${approvalRequired ? "\n[ADMIN_APPROVAL_REQUIRED]" : ""}`.trim(),
   });
 
   return NextResponse.json({ ok: true, approvalRequired });

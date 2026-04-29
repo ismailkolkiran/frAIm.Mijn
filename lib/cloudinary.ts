@@ -33,7 +33,7 @@ function buildSignature(params: Record<string, string>, apiSecret: string) {
   return crypto.createHash("sha1").update(`${serialized}${apiSecret}`).digest("hex");
 }
 
-export async function uploadToCloudinary(file: File, folder: string, resourceType: "image" | "raw") {
+export async function uploadToCloudinary(file: File, folder: string, resourceType: "image" | "raw" | "auto") {
   const { cloudName, apiKey, apiSecret } = parseCloudinaryUrl();
   const timestamp = `${Math.floor(Date.now() / 1000)}`;
 

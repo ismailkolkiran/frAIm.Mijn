@@ -30,27 +30,35 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   }
 
   if (updated.status === "goedgekeurd") {
-    await Promise.all([
-      sendLeaveApprovedEmail({
+    try {
+      await Promise.all([
+        sendLeaveApprovedEmail({
+          to: updated.email,
+          naam: updated.volledige_naam,
+          startdatum: updated.startdatum,
+          einddatum: updated.einddatum,
+        }),
+        sendBackofficeLeaveEmail({
+          naam: updated.volledige_naam,
+          startdatum: updated.startdatum,
+          einddatum: updated.einddatum,
+        }),
+      ]);
+    } catch (error) {
+      console.error("Leave approval email failed:", error);
+    }
+  } else {
+    try {
+      await sendLeaveRejectedEmail({
         to: updated.email,
         naam: updated.volledige_naam,
         startdatum: updated.startdatum,
         einddatum: updated.einddatum,
-      }),
-      sendBackofficeLeaveEmail({
-        naam: updated.volledige_naam,
-        startdatum: updated.startdatum,
-        einddatum: updated.einddatum,
-      }),
-    ]);
-  } else {
-    await sendLeaveRejectedEmail({
-      to: updated.email,
-      naam: updated.volledige_naam,
-      startdatum: updated.startdatum,
-      einddatum: updated.einddatum,
-      opmerkingen: updated.admin_opmerkingen,
-    });
+        opmerkingen: updated.admin_opmerkingen,
+      });
+    } catch (error) {
+      console.error("Leave rejection email failed:", error);
+    }
   }
 
   return NextResponse.json({ ok: true, updated });
