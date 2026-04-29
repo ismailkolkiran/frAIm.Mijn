@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createSessionToken, getRoleForEmail, verifyLoginCodeForUser } from "@/lib/auth";
+import { createSessionToken, getRoleForEmail } from "@/lib/auth";
+import { verifyLoginCodeForUser } from "@/lib/login-code-auth";
 import { getUserByEmail } from "@/lib/users";
 
 const payloadSchema = z.object({
