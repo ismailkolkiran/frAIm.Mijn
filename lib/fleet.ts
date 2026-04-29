@@ -57,5 +57,8 @@ export async function createVehicle(input:{type:string;beschrijving:string|null;
 }
 
 export async function assignVehicle(vehicleId:number,userId:number|null) {
-  await pool.query(`UPDATE apparatuur SET toegewezen_aan=$2,toewijzingsdatum=CASE WHEN $2 IS NULL THEN NULL ELSE CURRENT_DATE END WHERE id=$1`, [vehicleId,userId]);
+  await pool.query(
+    `UPDATE apparatuur SET toegewezen_aan=$2::int,toewijzingsdatum=CASE WHEN $2::int IS NULL THEN NULL ELSE CURRENT_DATE END WHERE id=$1`,
+    [vehicleId,userId],
+  );
 }

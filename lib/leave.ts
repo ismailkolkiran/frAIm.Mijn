@@ -199,11 +199,11 @@ export async function updateLeaveStatus(input: {
   >(
     `
       UPDATE verlofaanvragen v
-      SET status = $2,
+      SET status = $2::verlof_status,
           admin_id = $3,
           admin_opmerkingen = $4,
           bijgewerkt_op = NOW(),
-          medegedeeld_aan_backoffice = CASE WHEN $2 = 'goedgekeurd' THEN TRUE ELSE medegedeeld_aan_backoffice END
+          medegedeeld_aan_backoffice = CASE WHEN $2::verlof_status = 'goedgekeurd'::verlof_status THEN TRUE ELSE medegedeeld_aan_backoffice END
       FROM gebruikers g
       WHERE v.id = $1 AND g.id = v.gebruiker_id
       RETURNING v.id, v.gebruiker_id, g.volledige_naam, g.email,
